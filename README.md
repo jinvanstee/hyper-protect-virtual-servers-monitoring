@@ -23,4 +23,4 @@ This document assumes that you have already completed the following steps:
 
 Let's get started!
 
-# Copy this repo into your own Github repo
+## Clone this repo and edit configuration files to match your Hyper Protect Virtual Servers settings
