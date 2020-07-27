@@ -3,10 +3,10 @@ global:
 scrape_configs:
   - job_name: 'prometheus'
     static_configs:
-            - targets: ['collectdhost-first.hpvsmonitor.com:8443']
+            - targets: ['collectdhost-first.example.com:8443']
     scheme: https
     tls_config:
-        ca_file: /etc/prometheus/keys/servercertificate.pem
-        cert_file: /etc/prometheus/keys/clientcertificate.pem
+        ca_file: /etc/prometheus/keys/myrootCA.crt
+        cert_file: /etc/prometheus/keys/client-certificate.crt
         key_file:  /etc/prometheus/keys/client.key
-        server_name: collectdhost-first.hpvsmonitor.com
+        server_name: collectdhost-first.example.com
