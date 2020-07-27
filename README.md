@@ -36,7 +36,7 @@ You can test the validity of the credentials given to you, by running a simple `
 
 Here's an example of how to do a simple test:
 
-From the system that you intend to run `wget`, make an entry in the `/etc/hosts` file with `collectdhost-first.example.com` for the Hyper Protect Virtual Servers server IP(LPAR IP).
+This example assumes that the monitoring service hostname is `collectdhost-first.example.com` and listening on the default port of `8443`. From the system that you intend to run `wget`, make an entry in the `/etc/hosts` file with `collectdhost-first.example.com` for the Hyper Protect Virtual Servers server IP(LPAR IP).
 
 Then run the following to ensure that you can reach the `collectd-exporter` with the certificates and key you were given:
 
@@ -86,11 +86,13 @@ EOF
 Next, copy the `client.key`, `client-certificate.crt`, and `myrootCA.crt` files given to you by your Hyper Protect Virtual Servers appliance admin into the `keys` directory, so that your keys directory should contain the following:
 
 ```
+$ mkdir keys
+
 $ ls keys
 client.key            client-certificate.crt myrootCA.crt
 ```
 
-Note: you might need to rename the certificate and key files to match the names above. This way you don't have to modify the Prometheus configuration file. If you choose to retain the original names of your certificates and key, then you have to modify `prometheus.yml` to reflect those names.
+Note: you might need to rename the certificate and key files to match the names above. This way you don't have to modify the Prometheus configuration file, `prometheus.yml`. If you choose to retain the original names of your certificates and key, then you have to modify `prometheus.yml` to reflect those names.
 
 Next, replace the hostname in `prometheus.yml` with the collectd hostname of your service. From the same terminal where you set the `COLLECTD_HOSTNAME` environment variable above, run the following:
 
@@ -98,7 +100,27 @@ Next, replace the hostname in `prometheus.yml` with the collectd hostname of you
 $ sed -i '' 's/collectdhost-first.example.com/'${COLLECTD_HOSTNAME}'/g' prometheus.yml
 ```
 
+The `prometheus.yml` file is the configuration file for your Prometheus service. Below is the `prometheus.yml` in this repo. You may choose update any other setting in the configuration file you wish before building the service. Once you build the Prometheus image with these configuration settings, if you want to change any of the configuration settings after it has been built, you will have to go through another Secure Build to produce a new release of the image.
+
+```
+global:
+  scrape_interval: 10s
+scrape_configs:
+  - job_name: 'prometheus'
+    static_configs:
+            - targets: ['collectdhost-first.example.com:8443']
+    scheme: https
+    tls_config:
+        ca_file: /etc/prometheus/keys/myrootCA.crt
+        cert_file: /etc/prometheus/keys/client-certificate.crt
+        key_file:  /etc/prometheus/keys/client.key
+        server_name: collectdhost-first.example.com
+```
+
 Now you are ready to create your own private Github repo with these files. Note: only a private Github repo is recommended here because you will be pushing a private key to a Github repo and it is not recommended to do so in a public Github repo.
+
+## Create your own private Github repo
+
 
 
 
